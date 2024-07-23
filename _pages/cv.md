@@ -9,37 +9,99 @@ redirect_from:
 
 {% include base_path %}
 
-Education
+Educación
 ======
-* Ph.D in Version Control Theory, GitHub University, 2018 (expected)
-* M.S. in Jekyll, GitHub University, 2014
-* B.S. in GitHub, GitHub University, 2012
+* Ph.D in Artificial Intelligence, Universitat Politècnica de Catalunya (UPC), 2023 (expected)
+* M.S. in Data Science, Universitat Oberta de Catalunya (UOC), 2019
+* PgDip. in Data Science and Big Data, Universitat de Barcelona (UB), 2017
+* B.S. in Statistics, Universitat de Barcelona (UB) - Universitat Politècnica de Catalunya (UPC), 2012 - 2016
 
 Work experience
 ======
-* Spring 2024: Academic Pages Collaborator
-  * Github University
-  * Duties includes: Updates and improvements to template
-  * Supervisor: The Users
+* **March 2021 - Actually**: Data Scientist
+  * Federació Catalana de Basquetbol (FCBQ)
+  * Barcelona, Spain
+  * Carry out statistical studies, manipulate databases and create applications with information collected by the federation itself about its competitions.
 
-* Fall 2015: Research Assistant
-  * Github University
-  * Duties included: Merging pull requests
-  * Supervisor: Professor Hub
+* **April 2021 - Actually**: Professor Responsable
+  * Universitat Oberta de Catalunya (UOC)
+  * Barcelona, Spain
+  * Coordinator and manage statistics and mathematics subjects in the over 25 program.
 
-* Summer 2015: Research Assistant
-  * Github University
-  * Duties included: Tagging issues
-  * Supervisor: Professor Git
+* **Febrary 2019 - Actually**: Associate Professor
+  * Universitat Politècnica de Catalunya (UPC)
+  * Dept. Estadística i Investigació Operativa (DEIO)
+
+* **June 2018 - Actually**: CopyReader
+  * Departament d'Ensenyament - Generalitat de Catalunya
+  * Mathematics and science mathematics selectivity proofreader social
+
+* **April 2017 - November 2023**: Consultor
+  * Aplicaciones de Inteligencia Artificial (AIS)
+  * Barcelona, Spain
+  * Data analyst position creating predictive models especially focused on the marketing area
+
+* **Febrary 2017 - March 2024**: Associate Professor
+  * Universitat de Barcelona (UB)
+  * Dept. Econometria, Estadística i Economia Aplicada
+
+* **October 2021 - January 2024**: Volunteer Coordinator
+  * Federació Catalana de Baquetbol (FCBQ)
+  * Barcelona, Spain
+
+* **April 2011 - Actually**: Referee and referee assistant
+  * Federació Catalana de Baquetbol (FCBQ)
+  * Barcelona, Spain
+
+* **December 2016 - March 2017**: Data Manager
+  * Fundació Lluita contra la Sida
+  * Badalona, Spain
+
+* **October 2015 - January 2016**: Scholar
+  * Corporació Catalana de Mitjans Audiovisuals (CCMA)
+  * Sant Joan Despí, Spain
   
 Skills
 ======
-* Skill 1
-* Skill 2
-  * Sub-skill 2.1
-  * Sub-skill 2.2
-  * Sub-skill 2.3
-* Skill 3
+* Deep Learning
+* Big Data
+* Geospatial Data
+* Machine learning
+* Statistics
+* Times Series
+* Neural Networks and Graphs
+* Reinforcement Learning
+* Computer Vision
+
+Programming
+======
+* Operative Systems
+	* Windows
+	* Linux
+* BBDD
+	* PostreSQL
+	* pgAdmin
+	* MongoDB
+	* Cassandra
+	* SQL
+	* NoSQL
+* Editors
+	* Office
+	* LaTeX
+* Languages
+	* SAS
+		* SAS/OR
+	* C++
+	* R
+	* Python
+* Programs
+	* Minitab
+	* SPSS
+		* PSPP
+	* PowerBI
+	* Matlab
+	* Ghepi
+
 
 Publications
 ======
@@ -59,6 +121,6 @@ Teaching
     {% include archive-single-cv.html %}
   {% endfor %}</ul>
   
-Service and leadership
-======
-* Currently signed in to 43 different slack teams
+# Service and leadership
+# ======
+# * Currently signed in to 43 different slack teams
