@@ -1,0 +1,340 @@
+---
+title: "Base de datos del precio de la vivienda en Madrid"
+author: "Gema Fernández-Aviles"
+# format: html
+engine: knitr  ## LO AÑADO AHORA
+format: live-html
+webr:
+  packages:
+    - readxl    # Para leer los datos
+    - tidyverse # Para manipular los datos
+    - janitor   # Para limpiar los nombres de las variables
+    - sjmisc    # Para estadísticos descriptivos
+    # library(DataExplorer # Para report automático
+    - sf        # Para trabajar con datos espaciales
+    - mapSpain  # Para crear mapas de España
+    - DT        # Para mostrar tablas interactivas
+    - leaflet   # Para crear mapas interactivos
+    - tidyterra # Para trabajar con datos espaciales, tiles
+    - slippymath # Para trabajar con datos espaciales, tiles
+    - skimr    # Para estadísticos descriptivos
+#    - curl     # Para leer datos de la web
+  resources:
+    - housing_madrid 
+theme: cerulean
+highlight-style: ayu-mirage
+self-contained: true
+date: "`r Sys.Date()`"
+code-link: true
+number-sections: true
+execute:
+  code-overflow: scroll
+  echo: true
+  eval: true
+  output: true
+  include: true
+  freeze: auto
+  fig-height: 5
+  warning: false
+  code-fold: true
+  comment: "#>"
+  code-line-numbers: true
+  code-copy: true
+#bibliography: biblio.bib
+---
+
+{{< include ./_extensions/r-wasm/live/_knitr.qmd >}}
+
+
+![](housing_madrid/logo_mdsr_uclm.png){width=200px}
+
+# Read the libraries
+
+```{webr}
+library(readxl)     # Para leer los datos
+library(tidyverse)  # Para manipular los datos
+library(janitor)    # Para limpiar los nombres de las variables
+library(sjmisc)     # Para estadísticos descriptivos
+# library(DataExplorer)  # Para report automático
+library(sf)         # Para trabajar con datos espaciales
+library(mapSpain)   # Para crear mapas de España
+library(DT)         # Para mostrar tablas interactivas
+library(leaflet)    # Para crear mapas interactivos
+library(tidyterra)  # Para trabajar con datos espaciales, tiles
+# library(curl)       # Para leer datos de la web
+```
+
+
+
+# Read the data: Housing price in Madrid
+
+## Lee las variables
+```{webr read-var}
+list.files("housing_madrid")
+
+viviendas <- read_xls("housing_madrid/housing_price_madrid_NA_gema.xlsx",
+  sheet = "viviendas")
+```
+
+
+
+## Lee el diccionario del dataset
+```{webr read-dic}
+diccionario <- read_xls("housing_madrid/housing_price_madrid_NA_gema.xlsx",
+  sheet = "diccionario"
+)
+```
+
+## Lee el objeto espacial con los barrios de Madrid
+```{webr read-barrios}
+library(sf)         # Para trabajar con datos espaciales  
+barrios_madrid <- st_read("housing_madrid/madrid-barrios.gpkg", quiet = TRUE )
+```
+
+
+# Exploración inicial de los datos
+
+
+## Creación de una tabla con `GT` para mostrar las primeras filas del objeto `diccionario`
+```{webr}
+DT::datatable(diccionario, options = list(
+  pageLength = 7
+))
+```
+
+## Visualizacicón de las primeras filas del dataset con la librería `DT` del objeto `viviendas`, una vez se han homogeneizado los nombres de las variables con la función
+`clean_names()` de la librería `janitor`
+```{webr}
+viviendas <- viviendas %>%
+  clean_names()
+
+DT::datatable(viviendas, options = list(
+  pageLength = 7
+))
+```
+
+
+
+
+## Análisis exploratorio básico de los datos con `skimr`
+
+```{webr}
+library(skimr)  # Para estadísticos descriptivos)
+skim(viviendas)
+```
+
+
+
+## Resumen descriptivo de los datos. No lo ejecuto porque no se ve bien en el html
+
+```{webr}
+#| eval: false
+resumen_descriptivo <- descr(viviendas)
+resumen_descriptivo
+```
+
+
+
+## Analizamos la variable antigüedad de la vivienda, `antig` y la variable delincuencia,
+`delincuencia`, y utilizamos la función `group_by()`.
+
+```{webr}
+# agrupa por barrios y calcula la antiguiedad media de la vivienda
+antig_medio_barrios <- viviendas |>
+  group_by(barrio) |>
+  summarise(antig_mean = mean(antig, na.rm = TRUE))
+```
+
+
+```{webr}
+# crea un lollipop para ordenado de menor a mayor y con los segmentos a color 
+ggplot(antig_medio_barrios, aes(x = reorder(barrio, antig_mean), y = antig_mean)) +
+  geom_point() +
+  geom_segment(aes(xend = barrio, yend = 0), size = 0.5, col="blue") +
+  coord_flip() +
+  labs(title = "Antigüedad media de la vivienda por barrios de Madrid",
+    x = "Barrios",
+    y = "Antigüedad media (€/m2)"
+  ) +
+  theme_bw()
+```
+
+
+
+```{webr}
+# crea un lollipop para ordenado de menor a mayor y con los segmentos a color 
+ggplot(antig_medio_barrios, aes(x = reorder(barrio, antig_mean), y = antig_mean)) +
+  geom_point() +
+  geom_segment(aes(xend = barrio, yend = 0), size = 0.5, col="blue") +
+  coord_flip() +
+  labs(title = "Antigüedad media de la vivienda por barrios de Madrid",
+    x = "Barrios",
+    y = "Antigüedad media (€/m2)"
+  ) +
+  theme_bw()
+```
+
+## Analizamos la tasa de delincuencia por `distritos` de Madrid con la función `group_by()`
+
+```{webr}
+# agrupa por distritos y calcula la tasa de delincuencia
+delincuencia_media_distrito <- viviendas |>
+  group_by(distrito) |>
+  summarise(delincuencia_mean = mean(delincuencia, na.rm = TRUE))
+```
+
+
+```{webr}
+# crea un lollipop ordenado de menor a mayor
+ggplot(delincuencia_media_distrito, aes(x = reorder(distrito, delincuencia_mean), y = delincuencia_mean)) +
+  geom_point() +
+  geom_segment(aes(xend = distrito, yend = 0), size = 0.5, col="blue") +
+  coord_flip() +
+  labs(title = "Tasa de delincuencia media de los distritos de Madrid",
+    x = "Distritos",
+    y = "Tasa de delincuencia (%)"
+  ) +
+  theme_bw()
+
+```
+
+
+# Analisis espacial
+
+## Crea el objeto viviendas_sf y proyecta el CRS
+
+```{webr}
+viviendas_sf <- st_as_sf(
+  viviendas,
+  coords = c("longitud", "latitud"),
+  crs = st_crs(4326)
+)
+
+plot(viviendas_sf)   
+```
+
+
+## Crea un primer mapa con la localización de las viviendas utilizando `ggplot2` y `geom_sf()` con fondo. Utliza la función `esp_getTiles()` para obtener el fondo del mapa
+
+
+```{webr}
+# crea el fondo del mapa
+tile <- esp_getTiles(viviendas_sf, "IDErioja",
+  zoommin = 1,
+  crop = TRUE
+)
+
+# crea el mapa
+ggplot() +
+  geom_spatraster_rgb(data = tile) +
+  geom_sf(
+    data = viviendas_sf,
+    col = "blue",
+    size = 1.5,
+    alpha = 0.3
+  )
+```
+
+## Crea un mapa interactivo con `leaflet` y añade un cluster de puntos con `markerClusterOptions()`
+
+
+```{webr}
+precio_viv <- viviendas_sf$precio_house_em2
+
+leaflet(viviendas_sf) |>
+  addTiles() |>
+  addMarkers(popup = precio_viv, clusterOptions = markerClusterOptions()) |>
+  # cambia el color darkblue por una escala de colores para el precio de la vivienda
+  addCircleMarkers(radius = 1, color = ~ colorNumeric("viridis", domain = precio_viv)(precio_viv), popup = precio_viv) |>
+  # añade un etiqueta con el precio de la vivienda
+  addLegend("bottomright", pal = colorNumeric("viridis", domain = precio_viv), values = precio_viv, title = "Precio vivienda (€/m2)")
+```
+
+
+
+## Trabajamos con barrios utilizando el objeto `barrios_madrid`. Comprobamos que los datos y los barrios están bien definidos y en el mismo CRS.
+```{webr}
+# proyecta el CRS de barrios_madrid al CRS de viviendas_sf
+barrios_madrid <- st_transform(barrios_madrid, st_crs(viviendas_sf))
+# comprueba que los datos y los barrios están bien definidos y en el mismo CRS
+st_crs(barrios_madrid) == st_crs(viviendas_sf)
+```
+
+### Calcula el precio medio por barrio
+```{webr}
+pm <- viviendas |>
+   group_by(barrio) |>
+   summarise(precio_medio = mean(precio_house_em2))
+```
+
+### Une el precio medio, `pm`, al objeto `barrios_madrid`
+```{webr}
+barrios_madrid <- barrios_madrid |> left_join(pm)
+```
+
+```{webr}
+#| eval: false
+#| echo: false
+
+barrios_madrid_clean <- barrios_madrid %>% filter(!is.na(precio_medio))
+
+ggplot(barrios_madrid_clean) +
+ geom_sf(aes(fill = precio_medio), color = "black") +
+ scale_fill_gradientn(
+   colours = hcl.colors(20, "Inferno", rev = TRUE),
+   labels = scales::label_number(
+     big.mark = ".", 
+     decimal.mark = ",", 
+     suffix = "€/m2"
+     )
+   ) + 
+  theme_minimal()
+```
+
+
+
+### Especificamos la paleta de color a utilizar
+```{webr}
+cortes <- classInt::classIntervals(barrios_madrid$precio_medio,
+  style = "pretty"
+)$brks
+
+colores <- hcl.colors(15, "Spectral", rev = TRUE, alpha = 0.8)
+```
+
+
+### Crea el mapa con los barrios de Madrid y el precio medio de la vivienda
+```{webr}
+ggplot() +
+  geom_sf(
+    data = barrios_madrid,
+    fill = "gray90",
+    color = NA
+  ) +
+  geom_sf(
+    data = barrios_madrid,
+    aes(fill = precio_medio),
+    alpha = .7,
+    color = "grey50",
+  ) +
+  labs(color = "Precio medio vivienda (€/m2)") +
+  scale_fill_gradientn(
+    na.value = NA,
+    colours = colores,
+    breaks = cortes,
+    labels = function(x) {
+      paste0(x, "€/m2")
+    },
+    guide = guide_legend(reverse = TRUE)
+  ) +
+  theme_light() +
+  labs(
+    fill = "",
+    title = "Precio medio de la vivienda en Madrid",
+    subtitle = "Q2-2010"
+  )
+```
+
+
+
+
